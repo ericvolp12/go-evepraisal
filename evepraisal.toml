@@ -1,8 +1,8 @@
-http_addr=""
-https_addr="evepraisal.1v1.io:443"
+http_addr="127.0.0.0:8080"
+https_addr=""
 management_addr="127.0.0.1:8090"
-http_redirect=true
-letsencrypt_email="eric@1v1.io"
+http_redirect=false
+letsencrypt_email=""
 https_domain-whitelist=["evepraisal.1v1.io"]
 
 base-url="https://evepraisal.1v1.io"
