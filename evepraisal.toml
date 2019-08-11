@@ -1,11 +1,11 @@
-http_addr="127.0.0.1:8080"
+http_addr=":8080"
 https_addr=""
 management_addr="127.0.0.1:8090"
 http_redirect=false
 letsencrypt_email=""
-https_domain-whitelist=["evepraisal.1v1.io"]
+https_domain-whitelist=["evepraisal.com"]
 
-base-url="https://evepraisal.1v1.io"
+base-url="http://127.0.0.1:8080"
 
 ad-block=""
 extra-js=""
