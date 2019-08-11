@@ -1,5 +1,5 @@
 http_addr=""
-https_addr="https://evepraisal.1v1.io"
+https_addr="https://evepraisal.1v1.io:443"
 management_addr="127.0.0.1:8090"
 http_redirect=true
 letsencrypt_email="eric@1v1.io"
