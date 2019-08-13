@@ -2,7 +2,8 @@
   <h4>Component Pricing</h4>
   <h5><span class="nowrap">{{ prettybignumber .Totals.Sell }} <small>estimated sell value</small></span>
     <span class="nowrap">{{ prettybignumber .Totals.Buy }} <small>estimated buy value</small></span></h5>
-  <p>Because the market volume of this item is so low, the pricing is based on pricing of the materials needed to make it.</p>
+  <p>Because the market volume of this item is so low, the pricing is based on pricing of the materials needed to make
+    it.</p>
   <table class="table table-sm table-condensed table-striped">
     <thead>
       <tr>
@@ -18,7 +19,8 @@
       <tr>
         <td>
           <a href="/item/{{$component.Type.ID}}">
-            <img class="float-left media-object" src="https://image.eveonline.com/Type/{{$component.Type.ID}}_32.png" alt="{{$component.Type.Name}}"></a>
+            <img class="float-left media-object" src="https://image.eveonline.com/Type/{{$component.Type.ID}}_32.png"
+              alt="{{$component.Type.Name}}"></a>
           <a href="/item/{{$component.Type.ID}}">{{$component.Type.Name}}</a>
         </td>
         <td class="text-right">{{comma $component.Quantity}}</td>

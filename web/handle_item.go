@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strconv"
 
-	evepraisal "github.com/evepraisal/go-evepraisal"
-	"github.com/evepraisal/go-evepraisal/typedb"
+	evepraisal "github.com/ericvolp12/go-evepraisal"
+	"github.com/ericvolp12/go-evepraisal/typedb"
 	"github.com/go-zoo/bone"
 )
 
@@ -31,8 +31,9 @@ type componentDetails struct {
 
 func (d componentDetails) Totals() evepraisal.Totals {
 	return evepraisal.Totals{
-		Sell: d.Prices.Sell.Min * float64(d.Quantity),
-		Buy:  d.Prices.Buy.Max * float64(d.Quantity),
+		Sell:          d.Prices.Sell.Min * float64(d.Quantity),
+		Buy:           d.Prices.Buy.Max * float64(d.Quantity),
+		BuyPercentage: d.Prices.BuyPercentage * float64(d.Quantity),
 	}
 }
 

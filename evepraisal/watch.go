@@ -2,7 +2,7 @@
 
 package main
 
-import "github.com/evepraisal/go-evepraisal"
+import "github.com/ericvolp12/go-evepraisal"
 
 func startEnvironmentWatchers(app *evepraisal.App) {
 }

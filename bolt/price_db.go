@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/evepraisal/go-evepraisal"
+	"github.com/ericvolp12/go-evepraisal"
 	"github.com/golang/snappy"
 )
 
@@ -57,6 +57,8 @@ func (db *PriceDB) GetPrice(market string, typeID int64) (evepraisal.Prices, boo
 	if err != nil {
 		return *prices, false
 	}
+
+	prices.BuyPercentage = prices.Buy.Max * 0.85
 
 	return *prices, true
 

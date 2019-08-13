@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/evepraisal/go-evepraisal/parsers"
-	"github.com/evepraisal/go-evepraisal/typedb"
+	"github.com/ericvolp12/go-evepraisal/parsers"
+	"github.com/ericvolp12/go-evepraisal/typedb"
 )
 
 var (
@@ -19,9 +19,10 @@ var (
 
 // Totals represents sums of all prices/volumes for all items in the appraisal
 type Totals struct {
-	Buy    float64 `json:"buy"`
-	Sell   float64 `json:"sell"`
-	Volume float64 `json:"volume"`
+	Buy           float64 `json:"buy"`
+	BuyPercentage float64 `json:"buyPercentage"`
+	Sell          float64 `json:"sell"`
+	Volume        float64 `json:"volume"`
 }
 
 // Appraisal represents an appraisal (duh?). This is what is persisted and returned to users. See cleanAppraisal
@@ -129,6 +130,11 @@ func (i AppraisalItem) BuyTotal() float64 {
 	return float64(i.Quantity) * i.Prices.Buy.Max
 }
 
+// BuyPercentageTotal is used to give a representative buy total for an item
+func (i AppraisalItem) BuyPercentageTotal() float64 {
+	return float64(i.Quantity) * i.Prices.BuyPercentage
+}
+
 // SellISKVolume is used to give ISK per volume using the representative sell price
 func (i AppraisalItem) SellISKVolume() float64 {
 	return i.Prices.Sell.Min / i.TypeVolume
@@ -137,6 +143,19 @@ func (i AppraisalItem) SellISKVolume() float64 {
 // BuyISKVolume is used to give ISK per volume using the representative buy price
 func (i AppraisalItem) BuyISKVolume() float64 {
 	return i.Prices.Buy.Max / i.TypeVolume
+}
+
+// BuyPercentageISKVolume is used to give ISK per volume using the representative buy price
+func (i AppraisalItem) BuyPercentageISKVolume() float64 {
+	return i.Prices.BuyPercentage / i.TypeVolume
+}
+
+// SingleRepresentativePercentagePrice is used to give a representative price for a single item
+func (i AppraisalItem) SingleRepresentativePercentagePrice() float64 {
+	if i.Prices.Sell.Min != 0 {
+		return i.Prices.Sell.Min
+	}
+	return i.Prices.BuyPercentage
 }
 
 // SingleRepresentativePrice is used to give a representative price for a single item
@@ -152,6 +171,7 @@ func (i AppraisalItem) RepresentativePrice() float64 {
 	return float64(i.Quantity) * i.SingleRepresentativePrice()
 }
 
+// MarketItemPrices contains prices related to different markets
 type MarketItemPrices struct {
 	Market string
 	TypeID int64
@@ -160,11 +180,12 @@ type MarketItemPrices struct {
 
 // Prices represents prices for an item
 type Prices struct {
-	All      PriceStats `json:"all"`
-	Buy      PriceStats `json:"buy"`
-	Sell     PriceStats `json:"sell"`
-	Updated  time.Time  `json:"updated"`
-	Strategy string     `json:"strategy"`
+	All           PriceStats `json:"all"`
+	Buy           PriceStats `json:"buy"`
+	Sell          PriceStats `json:"sell"`
+	Updated       time.Time  `json:"updated"`
+	Strategy      string     `json:"strategy"`
+	BuyPercentage float64    `json:"buyPercentage"`
 }
 
 // String returns a nice string version of the prices
@@ -185,6 +206,8 @@ func (prices Prices) Set(price float64) Prices {
 	prices.Buy.Min = price
 	prices.Buy.Median = price
 	prices.Buy.Percentile = price
+
+	prices.BuyPercentage = price
 
 	prices.Sell.Average = price
 	prices.Sell.Max = price
@@ -212,6 +235,8 @@ func (prices Prices) Add(p Prices) Prices {
 	prices.Buy.Percentile += p.Buy.Percentile
 	prices.Buy.Stddev += p.Buy.Stddev
 	prices.Buy.Volume += p.Buy.Volume
+
+	prices.BuyPercentage += p.BuyPercentage
 
 	prices.Sell.Average += p.Sell.Average
 	prices.Sell.Max += p.Sell.Max
@@ -241,6 +266,8 @@ func (prices Prices) Sub(p Prices) Prices {
 	prices.Buy.Stddev -= p.Buy.Stddev
 	prices.Buy.Volume += p.Buy.Volume
 
+	prices.BuyPercentage -= p.BuyPercentage
+
 	prices.Sell.Average -= p.Sell.Average
 	prices.Sell.Max -= p.Sell.Max
 	prices.Sell.Min -= p.Sell.Min
@@ -266,6 +293,8 @@ func (prices Prices) Mul(multiplier float64) Prices {
 	prices.Buy.Median *= multiplier
 	prices.Buy.Percentile *= multiplier
 	prices.Buy.Stddev *= multiplier
+
+	prices.BuyPercentage *= multiplier
 
 	prices.Sell.Average *= multiplier
 	prices.Sell.Max *= multiplier
@@ -357,6 +386,7 @@ func (app *App) PricesForItem(market string, item AppraisalItem) (Prices, error)
 // PopulateItems will populate appraisal items with type and price information
 func (app *App) PopulateItems(appraisal *Appraisal) {
 	appraisal.Totals.Buy = 0
+	appraisal.Totals.BuyPercentage = 0
 	appraisal.Totals.Sell = 0
 	appraisal.Totals.Volume = 0
 
@@ -395,6 +425,7 @@ func (app *App) PopulateItems(appraisal *Appraisal) {
 		}
 		appraisal.Items[i].Prices = prices
 		appraisal.Totals.Buy += prices.Buy.Max * float64(appraisal.Items[i].Quantity)
+		appraisal.Totals.BuyPercentage += prices.BuyPercentage * float64(appraisal.Items[i].Quantity)
 		appraisal.Totals.Sell += prices.Sell.Min * float64(appraisal.Items[i].Quantity)
 		appraisal.Totals.Volume += appraisal.Items[i].TypeVolume * float64(appraisal.Items[i].Quantity)
 	}

@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/evepraisal/go-evepraisal"
-	"github.com/evepraisal/go-evepraisal/typedb"
+	"github.com/ericvolp12/go-evepraisal"
+	"github.com/ericvolp12/go-evepraisal/typedb"
 )
 
 // RestoreLegacyFile will load a given restore file into the database
@@ -224,7 +224,8 @@ type Prices struct {
 		Stddev     float64 `json:"stddev"`
 		Avg        float64 `json:"avg"`
 	} `json:"buy"`
-	All struct {
+	BuyPercentage float64 `json:"buyPercentage"`
+	All           struct {
 		Min        float64 `json:"min"`
 		Max        float64 `json:"max"`
 		Price      float64 `json:"price"`
@@ -254,6 +255,8 @@ func (p Prices) ToNewPrices() evepraisal.Prices {
 	prices.Buy.Percentile += p.Buy.Percentile
 	prices.Buy.Stddev += p.Buy.Stddev
 	prices.Buy.Volume += int64(p.Buy.Volume)
+
+	prices.BuyPercentage += p.BuyPercentage
 
 	prices.All.Average += p.All.Avg
 	prices.All.Max += p.All.Max
@@ -371,6 +374,7 @@ func ApplyPriceAndTypeInfo(appraisal *evepraisal.Appraisal, item *evepraisal.App
 			prices := lprice.ToNewPrices()
 			item.Prices = prices
 			appraisal.Totals.Buy += prices.Buy.Max * float64(item.Quantity)
+			appraisal.Totals.BuyPercentage += prices.BuyPercentage * float64(item.Quantity)
 			appraisal.Totals.Sell += prices.Sell.Min * float64(item.Quantity)
 		}
 	}

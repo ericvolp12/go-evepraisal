@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/evepraisal/go-evepraisal"
+	"github.com/ericvolp12/go-evepraisal"
 	"github.com/fsnotify/fsnotify"
 )
 

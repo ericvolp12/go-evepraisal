@@ -6,7 +6,7 @@ import (
 	"github.com/gonum/floats"
 	"github.com/gonum/stat"
 
-	"github.com/evepraisal/go-evepraisal"
+	"github.com/ericvolp12/go-evepraisal"
 )
 
 func nanToZero(f float64) float64 {
@@ -48,6 +48,7 @@ func getPriceAggregatesForOrders(orders []MarketOrder) evepraisal.Prices {
 		prices.Buy.Average = nanToZero(stat.GeometricMean(buyPrices, buyWeights))
 		prices.Buy.Min = floats.Min(buyPrices)
 		prices.Buy.Max = floats.Max(buyPrices)
+		prices.BuyPercentage = floats.Max(buyPrices) * 0.85
 		prices.Buy.Median = nanToZero(stat.Quantile(0.5, stat.Empirical, buyPrices, buyWeights))
 		prices.Buy.Percentile = nanToZero(stat.Quantile(0.99, stat.Empirical, buyPrices, buyWeights))
 		prices.Buy.Stddev = nanToZero(stat.StdDev(buyPrices, buyWeights))
